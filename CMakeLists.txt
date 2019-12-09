@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 
 project(sbfspot)
 
@@ -7,6 +7,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules
 
 find_package(Boost REQUIRED COMPONENTS system date_time)
 find_package(BLUETOOTH REQUIRED)
+find_package(GTest)
 
 set(SRC_NOSQL
         SBFspot/boost_ext.cpp

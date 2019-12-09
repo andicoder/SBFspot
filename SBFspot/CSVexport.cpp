@@ -1,5 +1,5 @@
 /************************************************************************************************
-	SBFspot - Yet another tool to read power production of SMA® solar inverters
+	SBFspot - Yet another tool to read power production of SMAï¿½ solar inverters
 	(c)2012-2018, SBF
 
 	Latest version found at https://github.com/SBFspot/SBFspot
@@ -8,8 +8,8 @@
 	http://creativecommons.org/licenses/by-nc-sa/3.0/
 
 	You are free:
-		to Share — to copy, distribute and transmit the work
-		to Remix — to adapt the work
+		to Share ï¿½ to copy, distribute and transmit the work
+		to Remix ï¿½ to adapt the work
 	Under the following conditions:
 	Attribution:
 		You must attribute the work in the manner specified by the author or licensor
@@ -146,7 +146,7 @@ int ExportMonthDataToCSV(const Config *cfg, InverterData *inverters[])
 			csvpath << strftime_t(cfg->outputPath, inverters[0]->monthData[0].datetime);
 			CreatePath(csvpath.str().c_str());
 
-			csvpath << FOLDER_SEP << cfg->plantname << "-" << strfgmtime_t("%Y%m", inverters[0]->monthData[0].datetime) << ".csv";
+			csvpath << FOLDER_SEP << cfg->plantname << "-Month-" << strfgmtime_t("%Y%m", inverters[0]->monthData[0].datetime) << ".csv";
 			
 			if ((csv = fopen(csvpath.str().c_str(), "w+")) == NULL)
 			{
@@ -184,8 +184,10 @@ int ExportMonthDataToCSV(const Config *cfg, InverterData *inverters[])
 					char *DMY = DateTimeFormatToDMY(cfg->DateFormat);
 					fprintf(csv, "%s", DMY);
 					free(DMY);
-					for (int inv=0; inverters[inv]!=NULL && inv<MAX_INVERTERS; inv++)
-						fprintf(csv, "%ckWh%ckWh", cfg->delimiter, cfg->delimiter);
+					for (int inv=0; inverters[inv]!=NULL && inv<MAX_INVERTERS; inv++) {
+                        fprintf(csv, "%cEnergy%cPower", cfg->delimiter, cfg->delimiter);
+                        break;
+                    }
 					fputs("\n", csv);
 				}
 			}
@@ -202,11 +204,18 @@ int ExportMonthDataToCSV(const Config *cfg, InverterData *inverters[])
 				if (datetime > 0)
 				{
 					fprintf(csv, "%s", strfgmtime_t(cfg->DateFormat, datetime));
+
+					int64_t totalWh = 0;
+					int64_t totalDayWh = 0;
+
 					for (int inv=0; inverters[inv]!=NULL && inv<MAX_INVERTERS; inv++)
 					{
-						fprintf(csv, "%c%s", cfg->delimiter, FormatDouble(FormattedFloat, (double)inverters[inv]->monthData[idx].totalWh/1000, 0, cfg->precision, cfg->decimalpoint));
-						fprintf(csv, "%c%s", cfg->delimiter, FormatDouble(FormattedFloat, (double)inverters[inv]->monthData[idx].dayWh/1000, 0, cfg->precision, cfg->decimalpoint));
+					    totalWh += inverters[inv]->monthData[idx].totalWh;
+                        totalDayWh += inverters[inv]->monthData[idx].dayWh;
 					}
+
+                    fprintf(csv, "%c%s", cfg->delimiter, FormatDouble(FormattedFloat, (double)totalWh/1000, 0, cfg->precision, cfg->decimalpoint));
+                    fprintf(csv, "%c%s", cfg->delimiter, FormatDouble(FormattedFloat, (double)totalDayWh/1000, 0, cfg->precision, cfg->decimalpoint));
 					fputs("\n", csv);
 				}
 			}
@@ -240,7 +249,7 @@ int ExportDayDataToCSV(const Config *cfg, InverterData *inverters[])
 	csvpath << strftime_t(cfg->outputPath, date);
 	CreatePath(csvpath.str().c_str());
 
-	csvpath << FOLDER_SEP << cfg->plantname << "-" << strftime_t("%Y%m%d", date) << ".csv";
+	csvpath << FOLDER_SEP << cfg->plantname << "-Day-"  << strftime_t("%Y%m%d", date) << ".csv";
 
 	if ((csv = fopen(csvpath.str().c_str(), "w+")) == NULL)
 	{
@@ -278,8 +287,10 @@ int ExportDayDataToCSV(const Config *cfg, InverterData *inverters[])
 			char *DMY = DateTimeFormatToDMY(cfg->DateTimeFormat);
 			fputs(DMY, csv);
 			free(DMY);
-			for (int inv=0; inverters[inv]!=NULL && inv<MAX_INVERTERS; inv++)
-				fprintf(csv, "%ckWh%ckW", cfg->delimiter, cfg->delimiter);
+			for (int inv=0; inverters[inv]!=NULL && inv<MAX_INVERTERS; inv++) {
+                fprintf(csv, "%cEnergy%cPower", cfg->delimiter, cfg->delimiter);
+                break;
+            }
 			fputs("\n", csv);
 		}
 	}
@@ -302,11 +313,15 @@ int ExportDayDataToCSV(const Config *cfg, InverterData *inverters[])
 			if ((cfg->CSV_SaveZeroPower == 1) || (totalPower > 0))
 			{
 				fprintf(csv, "%s", strftime_t(cfg->DateTimeFormat, datetime));
+				int64_t totalWatt = 0;
+                int64_t totalWh = 0;
 				for (int inv=0; inverters[inv]!=NULL && inv<MAX_INVERTERS; inv++)
 				{
-					fprintf(csv, "%c%s", cfg->delimiter, FormatDouble(FormattedFloat, (double)inverters[inv]->dayData[dd].totalWh/1000, 0, cfg->precision, cfg->decimalpoint));
-					fprintf(csv, "%c%s", cfg->delimiter, FormatDouble(FormattedFloat, (double)inverters[inv]->dayData[dd].watt/1000, 0, cfg->precision, cfg->decimalpoint));
+				    totalWatt += inverters[inv]->dayData[dd].watt;
+				    totalWh += inverters[inv]->dayData[dd].totalWh;
 				}
+                fprintf(csv, "%c%s", cfg->delimiter, FormatDouble(FormattedFloat, (double)totalWh/1000, 0, cfg->precision, cfg->decimalpoint));
+                fprintf(csv, "%c%s", cfg->delimiter, FormatDouble(FormattedFloat, (double)totalWatt/1000, 0, cfg->precision, cfg->decimalpoint));
 				fputs("\n", csv);
 			}
 		}
