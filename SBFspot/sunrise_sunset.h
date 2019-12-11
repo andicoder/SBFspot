@@ -1,5 +1,5 @@
 /************************************************************************************************
-	SBFspot - Yet another tool to read power production of SMA® solar inverters
+	SBFspot - Yet another tool to read power production of SMAï¿½ solar inverters
 	(c)2012-2018, SBF
 
 	Latest version found at https://github.com/SBFspot/SBFspot
@@ -8,8 +8,8 @@
 	http://creativecommons.org/licenses/by-nc-sa/3.0/
 
 	You are free:
-		to Share — to copy, distribute and transmit the work
-		to Remix — to adapt the work
+		to Share ï¿½ to copy, distribute and transmit the work
+		to Remix ï¿½ to adapt the work
 	Under the following conditions:
 	Attribution:
 		You must attribute the work in the manner specified by the author or licensor
@@ -40,6 +40,7 @@ DISCLAIMER:
 #include <time.h>
 #include <math.h>
 #include <string.h>     //memcpy
+#include <boost/date_time.hpp>
 
 #ifndef pi
 #define pi 3.141592653589793
@@ -47,6 +48,13 @@ DISCLAIMER:
 #define dtr(x) (pi / 180) * (x) //Convert degrees to radians
 #define rtd(x) (180 / pi) * (x) //Convert radians to degrees
 
-int sunrise_sunset(const float latit, const float longit, float *sunrise, float *sunset, const float offset);
+int sunrise_sunset(
+        const float latit,
+        const float longit,
+        float *sunrise,
+        float *sunset,
+        const float offset,
+        boost::local_time::time_zone_ptr tz
+);
 
 #endif

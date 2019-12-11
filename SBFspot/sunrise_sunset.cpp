@@ -1,5 +1,5 @@
 /************************************************************************************************
-	SBFspot - Yet another tool to read power production of SMA® solar inverters
+	SBFspot - Yet another tool to read power production of SMAï¿½ solar inverters
 	(c)2012-2018, SBF
 
 	Latest version found at https://github.com/SBFspot/SBFspot
@@ -8,8 +8,8 @@
 	http://creativecommons.org/licenses/by-nc-sa/3.0/
 
 	You are free:
-		to Share — to copy, distribute and transmit the work
-		to Remix — to adapt the work
+		to Share ï¿½ to copy, distribute and transmit the work
+		to Remix ï¿½ to adapt the work
 	Under the following conditions:
 	Attribution:
 		You must attribute the work in the manner specified by the author or licensor
@@ -110,7 +110,14 @@ double FNsun (double d)
 	return FNrange(L + 1.915 * rads * sin(g) + .02 * rads * sin(2 * g));
 };
 
-int sunrise_sunset(const float latit, const float longit, float *sunrise, float *sunset, const float offset)
+int sunrise_sunset(
+        const float latit,
+        const float longit,
+        float *sunrise,
+        float *sunset,
+        const float offset,
+        boost::local_time::time_zone_ptr tz
+)
 {
 	// get the date and time from the user
 	// read system date and extract the year
@@ -129,8 +136,18 @@ int sunrise_sunset(const float latit, const float longit, float *sunrise, float 
 
 	const double h = 12;
 
-	// Get TZ in hours
-	double tzone = (double)get_tzOffset(NULL) / 3600; //Fix for half-hour timezones
+    double tzone = 0.;
+	// use timezone from cfg, if provided
+	if(tz)
+	{
+        auto offset = tz->base_utc_offset();
+        tzone = (double)offset.total_seconds() / 3600;
+    }
+	else
+    {
+        // Get TZ in hours
+        tzone = (double) get_tzOffset(NULL) / 3600; //Fix for half-hour timezones
+    }
 
 	double d = FNday(y, m, day, h);
 

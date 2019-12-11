@@ -133,7 +133,13 @@ int main(int argc, char **argv)
     // for this location
     if ((cfg.latitude != 0) || (cfg.longitude != 0))
     {
-        cfg.isLight = sunrise_sunset(cfg.latitude, cfg.longitude, &cfg.sunrise, &cfg.sunset, (float)cfg.SunRSOffset / 3600);
+        cfg.isLight = sunrise_sunset(
+                cfg.latitude,
+                cfg.longitude,
+                &cfg.sunrise,
+                &cfg.sunset,
+                (float)cfg.SunRSOffset / 3600,
+                cfg.tz);
 
         if (VERBOSE_NORMAL)
         {
