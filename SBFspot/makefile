@@ -126,4 +126,6 @@ cleanall:
 
 clean: cleanall
 
+all: nosql sqlite mysql mariadb
+
 .PHONY: nosql sqlite mysql mariadb install_nosql install_sqlite install_mysql install_mariadb cleanall clean
