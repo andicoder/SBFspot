@@ -58,3 +58,12 @@ add_executable(influxdb-test
 
 set_property(TARGET influxdb-test PROPERTY CXX_STANDARD 11)
 target_link_libraries(influxdb-test ${CURL_LIBRARIES})
+
+include(GNUInstallDirs)
+set(bin_dir "${CMAKE_INSTALL_BINDIR}/sbfspot.3")
+file(GLOB txt_files TagList*.txt)
+install(TARGETS ${PROJECT_NAME} DESTINATION ${bin_dir})
+install(FILES
+        date_time_zonespec.csv
+        ${txt_files}
+        DESTINATION ${bin_dir})
