@@ -51,13 +51,13 @@ add_executable(
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${CURL_LIBRARIES} ${BLUEZ_LINK_LIBRARIES})
 
-add_executable(influxdb-test
-        influxdb.cpp
-        influxdb.test.cpp
-)
-
-set_property(TARGET influxdb-test PROPERTY CXX_STANDARD 11)
-target_link_libraries(influxdb-test ${CURL_LIBRARIES})
+#add_executable(influxdb-test
+#        influxdb.cpp
+#        influxdb.test.cpp
+#)
+#
+#set_property(TARGET influxdb-test PROPERTY CXX_STANDARD 11)
+#target_link_libraries(influxdb-test ${CURL_LIBRARIES})
 
 include(GNUInstallDirs)
 set(bin_dir "${CMAKE_INSTALL_BINDIR}/sbfspot.3")
