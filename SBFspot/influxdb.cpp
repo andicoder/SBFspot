@@ -2,8 +2,6 @@
 #include <curl/curl.h>
 #include <chrono>
 
-const int MAX_INVERTERS = 20;
-
 namespace
 {
 void applyHttpAuth(CURL* curl, const std::string& auth)
