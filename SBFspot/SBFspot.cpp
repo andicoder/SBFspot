@@ -2311,7 +2311,7 @@ int GetConfig(Config *cfg)
 	// InfluxDB default values
 	cfg->influxdb_host = "localhost";
     cfg->influxdb_port = "8086";
-    cfg->influxdb_measurement = "sbfspot";
+    cfg->influxdb_database = "sbfspot";
 
     const char *CFG_Boolean = "(0-1)";
     const char *CFG_InvalidValue = "Invalid value for '%s' %s\n";
@@ -2663,8 +2663,6 @@ int GetConfig(Config *cfg)
                     cfg->influxdb_port = value;
                 else if (stricmp(variable, "InfluxDB_Database") == 0)
                     cfg->influxdb_database = value;
-                else if (stricmp(variable, "InfluxDB_Measurement") == 0)
-                    cfg->influxdb_measurement = value;
                 else if (stricmp(variable, "InfluxDB_User") == 0)
                     cfg->influxdb_user = value;
                 else if (stricmp(variable, "InfluxDB_Password") == 0)
@@ -2821,8 +2819,7 @@ void ShowConfig(Config *cfg)
 	{
         std::cout << "InfluxDB_Host=" << cfg->influxdb_host << \
 			"\nInfluxDB_Port=" << cfg->influxdb_port << \
-			"\nInfluxDB_Database=" << cfg->influxdb_database << \
-			"\nInfluxDB_Measurement=" << cfg->influxdb_measurement << std::endl;
+			"\nInfluxDB_Database=" << cfg->influxdb_database << std::endl;
 	}
 
 	std::cout << "### End of Config ###" << std::endl;

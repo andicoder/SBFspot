@@ -263,8 +263,7 @@ typedef struct
 	// InfluxDB Stuff
 	std::string influxdb_host;      // default localhost
     std::string influxdb_port;      // default 8086
-    std::string influxdb_database;
-    std::string influxdb_measurement; // default sbfspot
+    std::string influxdb_database;  // default sbfspot
     std::string influxdb_user;
     std::string influxdb_password;
 
