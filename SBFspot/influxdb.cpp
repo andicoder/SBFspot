@@ -22,21 +22,13 @@ curl_slist* applyHttpHeaders(CURL* curl, const std::vector<std::string>& headers
     return curlHeaderList;
 }
 
-//void readResultInto(CURL* curl, CURLcode resultCode, net::Result& out_result)
-//{
-//    long httpCode{};
-//    curl_easy_getinfo(curl, CURLINFO_HTTP_CODE, &httpCode);
-//    out_result.httpCode = static_cast<uint16_t>(httpCode);
-//    out_result.success = (httpCode < 300 && httpCode >= 200);
-//}
-
 size_t writeDataCb(void* ptr, size_t size, size_t nmemb, std::string* data)
 {
     data->append((char*)ptr, size * nmemb);
     return size * nmemb;
 }
 
-int Post(const std::string& url, const std::string& data, const std::string& httpAuth)
+bool Post(const std::string& url, const std::string& data, const std::string& httpAuth)
 {
     std::vector<std::string> httpHeaders;
 
@@ -59,13 +51,14 @@ int Post(const std::string& url, const std::string& data, const std::string& htt
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
     /* Perform the request, res will get the return code */
-    auto curl_res = curl_easy_perform(curl);
-//    readResultInto(curl, curl_res, res);
+    CURLcode curlRes = curl_easy_perform(curl);
+    long httpCode{};
+    curl_easy_getinfo(curl, CURLINFO_HTTP_CODE, &httpCode);
+    bool success = (httpCode < 300 && httpCode >= 200);
 
     curl_slist_free_all(curlHeaderList); /* free the list again */
-    
     curl_easy_cleanup(curl);
-    return 0;
+    return success && CURLE_OK == curlRes;
 }
 
 void AppendInverterData(InverterData *inverter, std::string& sendBuffer, time_t spotTime)
@@ -127,7 +120,6 @@ int ExportSpotDataToInfluxdb(const Config *cfg, InverterData *inverters[])
         AppendInverterData(inverters[inv], sendBuffer, spottime);
     }
 
-    Post("", sendBuffer, "");
-
-    return 0;
+    std::string url = "http://" + cfg->influxdb_host + ":" + cfg->influxdb_port + "/write?db=" + cfg->influxdb_database;
+    return Post(url, sendBuffer, cfg->influxdb_user + ":" + cfg->influxdb_password) ? 0 : 1;
 }
