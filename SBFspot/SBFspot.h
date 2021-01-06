@@ -260,6 +260,13 @@ typedef struct
 	std::string mqtt_publish_data;	// comma delimited list of spot data to publish (Timestamp,Serial,MeteringDyWhOut,GridMsTotW,...)
 	std::string mqtt_item_format;   // default "{key}": {value}
 	std::string mqtt_item_delimiter;// default comma
+	// InfluxDB Stuff
+	std::string influxdb_host;      // default localhost
+    std::string influxdb_port;      // default 8086
+    std::string influxdb_database;
+    std::string influxdb_measurement; // default sbfspot
+    std::string influxdb_user;
+    std::string influxdb_password;
 
 	//Commandline settings
 	int		debug;				// -d			Debug level (0-5)
@@ -278,6 +285,7 @@ typedef struct
     S123_COMMAND	s123;		// -123s		123Solar Web Solar logger support(http://www.123solar.org/)
 	int		settime;			// -settime		Set plant time
 	int		mqtt;				// -mqtt		Publish spot data to mqtt broker
+	int     influxdb;           // -influxdb    Publish spot data to influxdb
 } Config;
 
 

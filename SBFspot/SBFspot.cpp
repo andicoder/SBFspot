@@ -73,6 +73,7 @@ DISCLAIMER:
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/address.hpp>
 #include "mqtt.h"
+#include "influxdb.h"
 
 using namespace std;
 using namespace boost;
@@ -622,7 +623,20 @@ int main(int argc, char **argv)
 		}
 	}
 
-	//SolarInverter -> Continue to get archive data
+    /***********
+    * InfluxDB *
+    ************/
+    if (cfg.influxdb == 1) // InfluxDB enabled
+    {
+        rc = ExportSpotDataToInfluxdb(&cfg, Inverters);
+        if (rc != 0)
+        {
+            std::cout << "Error " << rc << " while posting to InfluxDB" << std::endl;
+        }
+    }
+
+
+    //SolarInverter -> Continue to get archive data
 	unsigned int idx;
 
     /***************
@@ -1872,6 +1886,7 @@ int parseCmdline(int argc, char **argv, Config *cfg)
 	cfg->startdate = 0;
 	cfg->settime = 0;
 	cfg->mqtt = 0;
+	cfg->influxdb = 0;
 
 	bool help_requested = false;
 
@@ -2126,6 +2141,8 @@ int parseCmdline(int argc, char **argv, Config *cfg)
 
 		else if (stricmp(argv[i], "-mqtt") == 0)
 			cfg->mqtt = 1;
+		else if (stricmp(argv[i], "-influxdb") == 0)
+		    cfg->influxdb = 1;
 
         //Show Help
         else if (stricmp(argv[i], "-?") == 0)
@@ -2206,7 +2223,8 @@ void SayHello(int ShowHelp)
 		std::cout << " -loadlive           Use predefined settings for manual upload to pvoutput.org\n";
 		std::cout << " -startdate:YYYYMMDD Set start date for historic data retrieval\n";
 		std::cout << " -settime            Sync inverter time with host time\n";
-		std::cout << " -mqtt               Publish spot data to MQTT broker\n" << std::endl;
+		std::cout << " -mqtt               Publish spot data to MQTT broker\n";
+        std::cout << " -influxdb           Publish spot data to InfluxDB\n" << std::endl;
 
 		std::cout << "Libraries used:\n";
 #if defined(USE_SQLITE)
@@ -2290,6 +2308,10 @@ int GetConfig(Config *cfg)
 	cfg->mqtt_publish_args = "-h {host} -t {topic} -m \"{{message}}\"";
 	cfg->mqtt_publish_data = "Timestamp,SunRise,SunSet,InvSerial,InvName,InvStatus,EToday,ETotal,PACTot,UDC1,UDC2,IDC1,IDC2,PDC1,PDC2";
 	cfg->mqtt_item_format = "\"{key}\": {value}";
+	// InfluxDB default values
+	cfg->influxdb_host = "localhost";
+    cfg->influxdb_port = "8086";
+    cfg->influxdb_measurement = "sbfspot";
 
     const char *CFG_Boolean = "(0-1)";
     const char *CFG_InvalidValue = "Invalid value for '%s' %s\n";
@@ -2635,8 +2657,20 @@ int GetConfig(Config *cfg)
 						rc = -2;
 					}
 				}
+                else if (stricmp(variable, "InfluxDB_Host") == 0)
+                    cfg->influxdb_host = value;
+                else if (stricmp(variable, "InfluxDB_Port") == 0)
+                    cfg->influxdb_port = value;
+                else if (stricmp(variable, "InfluxDB_Database") == 0)
+                    cfg->influxdb_database = value;
+                else if (stricmp(variable, "InfluxDB_Measurement") == 0)
+                    cfg->influxdb_measurement = value;
+                else if (stricmp(variable, "InfluxDB_User") == 0)
+                    cfg->influxdb_user = value;
+                else if (stricmp(variable, "InfluxDB_Password") == 0)
+                    cfg->influxdb_password = value;
 
-				// Add more config keys here
+                // Add more config keys here
 
                 else
                     fprintf(stderr, "Warning: Ignoring keyword '%s'\n", variable);
@@ -2781,6 +2815,14 @@ void ShowConfig(Config *cfg)
 			"\nMQTT_PublisherArgs=" << cfg->mqtt_publish_args << \
 			"\nMQTT_Data=" << cfg->mqtt_publish_data << \
 			"\nMQTT_ItemFormat=" << cfg->mqtt_item_format << std::endl;
+	}
+
+	if (cfg->influxdb == 1)
+	{
+        std::cout << "InfluxDB_Host=" << cfg->influxdb_host << \
+			"\nInfluxDB_Port=" << cfg->influxdb_port << \
+			"\nInfluxDB_Database=" << cfg->influxdb_database << \
+			"\nInfluxDB_Measurement=" << cfg->influxdb_measurement << std::endl;
 	}
 
 	std::cout << "### End of Config ###" << std::endl;
