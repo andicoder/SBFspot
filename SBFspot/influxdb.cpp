@@ -4,6 +4,14 @@
 
 namespace
 {
+std::string escape(std::string src)
+{
+	boost::replace_all(src, " ", "\\ ");
+	boost::replace_all(src, ",", "\\,");
+	boost::replace_all(src, "=", "\\=");
+	return src;
+}
+
 void applyHttpAuth(CURL* curl, const std::string& auth)
 {
 	curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
@@ -73,8 +81,8 @@ void AppendInverterData(InverterData* inverter, std::string& sendBuffer, std::ch
     sendBuffer.append(#name).append(1, '=').append(std::to_string(inverter->value / factor))
 
 	sendBuffer.append("spot,"); // measurement
-	sendBuffer.append("DeviceName=").append(inverter->DeviceName).append(1, ',');
-	sendBuffer.append("DeviceType=").append(inverter->DeviceType).append(1, ',');
+	sendBuffer.append("DeviceName=").append(escape(inverter->DeviceName)).append(1, ',');
+	sendBuffer.append("DeviceType=").append(escape(inverter->DeviceType)).append(1, ',');
 	sendBuffer.append("Serial=").append(std::to_string(inverter->Serial)).append(1, ' ');
 
 	APPEND_VALUE(Pdc1, 1.f).append(1, ',');
@@ -125,7 +133,6 @@ int ExportSpotDataToInfluxdb(const Config* cfg, InverterData* inverters[])
 			sendBuffer.append(1, '\n');
 		}
 
-		strcpy(total.DeviceType, inverters[inv]->DeviceType);
 		total.Pdc1 += inverters[inv]->Pdc1;
 		total.Pdc2 += inverters[inv]->Pdc2;
 		total.Idc1 += inverters[inv]->Idc1;
@@ -156,6 +163,7 @@ int ExportSpotDataToInfluxdb(const Config* cfg, InverterData* inverters[])
 	}
 
 	strcpy(total.DeviceName, cfg->plantname);
+	strcpy(total.DeviceType, "Net");
 	total.calEfficiency = total.calPdcTot == 0 ? 0.f : 100.f * total.calPacTot / total.calPdcTot;
 	sendBuffer.append(1, '\n');
 	AppendInverterData(&total, sendBuffer, spotTimeNs);
