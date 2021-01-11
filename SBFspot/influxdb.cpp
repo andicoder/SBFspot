@@ -121,7 +121,7 @@ void AppendDayData(const DayData& dd, std::string& sendBuffer)
 	sendBuffer.append("day "); // measurement
 	sendBuffer.append("Energy").append(1, '=').append(std::to_string((double)dd.totalWh / 1000.))
 		.append(1, ',');;
-	sendBuffer.append("Power").append(1, '=').append(std::to_string((double)dd.watt / 1000.))
+	sendBuffer.append("Power").append(1, '=').append(std::to_string(dd.watt))
 		.append(1, ' ');;
 	sendBuffer.append(std::to_string(dd.datetime));
 }
