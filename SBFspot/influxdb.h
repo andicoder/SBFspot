@@ -6,5 +6,6 @@
 #include "EventData.h"
 
 int ExportSpotDataToInfluxdb(const Config *cfg, InverterData *inverters[]);
+int ExportDayDataToInfluxdb(const Config *cfg, InverterData *inverters[]);
 
 #endif //INFLUXDB_H

@@ -670,6 +670,8 @@ int main(int argc, char **argv)
 
             if (cfg.CSV_Export == 1)
                 ExportDayDataToCSV(&cfg, Inverters);
+            if (cfg.influxdb == 1)
+				ExportDayDataToInfluxdb(&cfg, Inverters);
 
 			#if defined(USE_SQLITE) || defined(USE_MYSQL)
 			if ((!cfg.nosql) && db.isopen())
