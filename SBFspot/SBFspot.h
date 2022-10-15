@@ -1,5 +1,5 @@
 /************************************************************************************************
-	SBFspot - Yet another tool to read power production of SMA® solar inverters
+	SBFspot - Yet another tool to read power production of SMAï¿½ solar inverters
 	(c)2012-2020, SBF
 
 	Latest version found at https://github.com/SBFspot/SBFspot
@@ -8,8 +8,8 @@
 	http://creativecommons.org/licenses/by-nc-sa/3.0/
 
 	You are free:
-		to Share — to copy, distribute and transmit the work
-		to Remix — to adapt the work
+		to Share ï¿½ to copy, distribute and transmit the work
+		to Remix ï¿½ to adapt the work
 	Under the following conditions:
 	Attribution:
 		You must attribute the work in the manner specified by the author or licensor
@@ -261,11 +261,12 @@ typedef struct
 	std::string mqtt_item_format;   // default "{key}": {value}
 	std::string mqtt_item_delimiter;// default comma
 	// InfluxDB Stuff
-	std::string influxdb_host;      // default localhost
-    std::string influxdb_port;      // default 8086
+	std::string influxdb_url;      // default http://localhost:8086
     std::string influxdb_database;  // default sbfspot
     std::string influxdb_user;
     std::string influxdb_password;
+	std::string influxdb_token;
+	std::string influxdb_organisation;
 
 	//Commandline settings
 	int		debug;				// -d			Debug level (0-5)

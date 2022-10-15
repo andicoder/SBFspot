@@ -6,16 +6,16 @@
                               |____/|____/|_|  |___/ .__/ \___/ \__|
                                                    |_|
 
-	SBFspot - Yet another tool to read power production of SMA® solar/battery inverters
+	SBFspot - Yet another tool to read power production of SMAï¿½ solar/battery inverters
 	(c)2012-2020, SBF
 
 	Latest version can be found at https://github.com/SBFspot/SBFspot
 
 	Special Thanks to:
 	S. Pittaway: Author of "NANODE SMA PV MONITOR" on which this project is based.
-	W. Simons  : Early adopter, main tester and SMAdata2® Protocol analyzer
-	G. Schnuff : SMAdata2® Protocol analyzer
-	T. Frank   : Speedwire® support
+	W. Simons  : Early adopter, main tester and SMAdata2ï¿½ Protocol analyzer
+	G. Schnuff : SMAdata2ï¿½ Protocol analyzer
+	T. Frank   : Speedwireï¿½ support
 	Snowmiss   : User manual
 	All other users for their contribution to the success of this project
 
@@ -29,8 +29,8 @@
 	http://creativecommons.org/licenses/by-nc-sa/3.0/
 
 	You are free:
-		to Share — to copy, distribute and transmit the work
-		to Remix — to adapt the work
+		to Share ï¿½ to copy, distribute and transmit the work
+		to Remix ï¿½ to adapt the work
 	Under the following conditions:
 	Attribution:
 		You must attribute the work in the manner specified by the author or licensor
@@ -1083,7 +1083,7 @@ E_SBFSPOT ethInitConnection(InverterData *inverters[], char *IP_Address)
 
     	ethSend(pcktBuf, IP_Broadcast);
 
-    	//SMA inverter announces it´s presence in response to the discovery request packet
+    	//SMA inverter announces itï¿½s presence in response to the discovery request packet
     	int bytesRead = ethRead(CommBuf, sizeof(CommBuf));
 
 		// if bytesRead < 0, a timeout has occurred
@@ -2311,8 +2311,7 @@ int GetConfig(Config *cfg)
 	cfg->mqtt_publish_data = "Timestamp,SunRise,SunSet,InvSerial,InvName,InvStatus,EToday,ETotal,PACTot,UDC1,UDC2,IDC1,IDC2,PDC1,PDC2";
 	cfg->mqtt_item_format = "\"{key}\": {value}";
 	// InfluxDB default values
-	cfg->influxdb_host = "localhost";
-    cfg->influxdb_port = "8086";
+	cfg->influxdb_url = "http://localhost:8086";
     cfg->influxdb_database = "sbfspot";
 
     const char *CFG_Boolean = "(0-1)";
@@ -2659,16 +2658,18 @@ int GetConfig(Config *cfg)
 						rc = -2;
 					}
 				}
-                else if (stricmp(variable, "InfluxDB_Host") == 0)
-                    cfg->influxdb_host = value;
-                else if (stricmp(variable, "InfluxDB_Port") == 0)
-                    cfg->influxdb_port = value;
+                else if (stricmp(variable, "InfluxDB_Url") == 0)
+                    cfg->influxdb_url = value;
                 else if (stricmp(variable, "InfluxDB_Database") == 0)
                     cfg->influxdb_database = value;
                 else if (stricmp(variable, "InfluxDB_User") == 0)
                     cfg->influxdb_user = value;
                 else if (stricmp(variable, "InfluxDB_Password") == 0)
                     cfg->influxdb_password = value;
+				else if (stricmp(variable, "InfluxDB_Token") == 0)
+					cfg->influxdb_token = value;
+				else if (stricmp(variable, "InfluxDB_Organisation") == 0)
+					cfg->influxdb_organisation = value;
 
                 // Add more config keys here
 
@@ -2819,8 +2820,7 @@ void ShowConfig(Config *cfg)
 
 	if (cfg->influxdb == 1)
 	{
-        std::cout << "InfluxDB_Host=" << cfg->influxdb_host << \
-			"\nInfluxDB_Port=" << cfg->influxdb_port << \
+        std::cout << "InfluxDB_Url=" << cfg->influxdb_url << \
 			"\nInfluxDB_Database=" << cfg->influxdb_database << std::endl;
 	}
 

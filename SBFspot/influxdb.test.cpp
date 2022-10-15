@@ -1,5 +1,6 @@
 #include "influxdb.h"
 
+const int MAX_INVERTERS = 20;
 int main()
 {
 	InverterData inverter{
@@ -27,9 +28,10 @@ int main()
 	strcpy(inverter2.DeviceType, "Inverter");
 
 	Config cfg = {
-		.influxdb_host = "localhost",
-		.influxdb_port = "8086",
+		.influxdb_url = "https://eu-central-1-1.aws.cloud2.influxdata.com",
 		.influxdb_database = "smartmeter",
+		.influxdb_token = "",
+		.influxdb_organisation = "tbw4",
 		.influxdb = 1,
 	};
 

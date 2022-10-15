@@ -42,9 +42,23 @@ size_t writeDataCb(void* ptr, size_t size, size_t nmemb, std::string* data)
 	return size * nmemb;
 }
 
-bool Post(const std::string& url, const std::string& data, const std::string& httpAuth)
+bool Post(const Config* cfg, const std::string& data)
 {
+	std::string url{ cfg->influxdb_url};
+
 	std::vector<std::string> httpHeaders;
+	if(!cfg->influxdb_token.empty())
+	{
+		httpHeaders.push_back(std::string("Authorization: Token ").append(cfg->influxdb_token));
+		url.append("/api/v2/write?bucket=").append(cfg->influxdb_database)
+			.append("&org=").append(cfg->influxdb_organisation).append(1, '&');
+	}
+	else
+	{
+		url.append("/write?db=").append(cfg->influxdb_database).append(1, '&');
+	}
+
+	url.append("precision=s");
 
 	curl_global_init(CURL_GLOBAL_ALL);
 	auto curl = curl_easy_init();
@@ -57,7 +71,8 @@ bool Post(const std::string& url, const std::string& data, const std::string& ht
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
 	curl_slist* curlHeaderList = applyHttpHeaders(curl, httpHeaders);
-	applyHttpAuth(curl, httpAuth);
+	if(cfg->influxdb_token.empty())
+		applyHttpAuth(curl, cfg->influxdb_user + ":" + cfg->influxdb_password);
 
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeDataCb);
 
@@ -180,13 +195,7 @@ int ExportSpotDataToInfluxdb(const Config* cfg, InverterData* inverters[])
 	sendBuffer.append(1, '\n');
 	AppendInverterData(&total, sendBuffer, spotTime);
 
-	std::string url{ "http://" };
-	url.append(cfg->influxdb_host).append(1, ':').append(cfg->influxdb_port).append("/write?")
-		.append("u=").append(cfg->influxdb_user).append(1, '&')
-		.append("p=").append(cfg->influxdb_password).append(1, '&')
-		.append("precision=s").append(1, '&')
-		.append("db=").append(cfg->influxdb_database);
-	return Post(url, sendBuffer, cfg->influxdb_user + ":" + cfg->influxdb_password) ? 0 : 1;
+	return Post(cfg, sendBuffer) ? 0 : 1;
 }
 
 int ExportDayDataToInfluxdb(const Config* cfg, InverterData* inverters[])
@@ -259,11 +268,5 @@ int ExportDayDataToInfluxdb(const Config* cfg, InverterData* inverters[])
 	}
 
 
-	std::string url{ "http://" };
-	url.append(cfg->influxdb_host).append(1, ':').append(cfg->influxdb_port).append("/write?")
-		.append("u=").append(cfg->influxdb_user).append(1, '&')
-		.append("p=").append(cfg->influxdb_password).append(1, '&')
-		.append("precision=s").append(1, '&')
-		.append("db=").append(cfg->influxdb_database);
-	return Post(url, sendBuffer, cfg->influxdb_user + ":" + cfg->influxdb_password) ? 0 : 1;
+	return Post(cfg, sendBuffer) ? 0 : 1;
 }
